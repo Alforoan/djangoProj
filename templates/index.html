@@ -237,11 +237,12 @@
                                       <!-- <li>
                                         <hr class="-mx-2 my-2 ">
                                       </li> -->
-                                      <li> 
-                                          <a href="#" class="flex items-center px-3 py-2 text-red-500 hover:bg-red-100 hover:text-red-500 rounded-md ">
-                                           <i class="uil-trash-alt mr-1"></i>  Delete Post
-                                          </a> 
-                                      </li>
+                                      <form action="{% url 'delete_post' post.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="flex items-center px-3 py-2 text-red-500 hover:bg-red-100 hover:text-red-500 rounded-md">
+                        <i class="uil-trash-alt mr-1"></i> Delete Post
+                    </button>
+                </form>
                                     </ul>
                                 
                                 </div>

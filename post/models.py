@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth import get_user_model
 import uuid
 from datetime import datetime
+from django.contrib.auth.models import AbstractUser
 
 User = get_user_model()
 
@@ -13,10 +14,11 @@ class Profile(models.Model):
   bio = models.TextField(blank=True)
   profileimg = models.ImageField(upload_to='profile_images', default='blank-profile-picture.png')
   location = models.CharField(max_length=100, blank=True)
-  
+  is_moderator = models.BooleanField(default=False) 
+
   def __str__(self):
     return self.user.username
-  
+
 class Post(models.Model):
   id = models.UUIDField(primary_key=True, default = uuid.uuid4)
   user = models.CharField(max_length=100)

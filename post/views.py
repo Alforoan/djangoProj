@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
@@ -26,7 +26,6 @@ def index(request):
       feed.append(feed_lists)
 
   feed_list = list(chain(*feed))
-
   # user suggestion starts
   all_users = User.objects.all()
   user_following_all = []
@@ -226,3 +225,11 @@ def search(request):
         
         username_profile_list = list(chain(*username_profile_list))
     return render(request, 'search.html', {'user_profile': user_profile, 'username_profile_list': username_profile_list})
+
+def delete_post(request, pk):
+   post = get_object_or_404(Post, id=pk)
+   if request.method == 'POST':
+      post.delete()
+      return redirect('/')
+
+   return redirect('/')
