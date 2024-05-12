@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
-from .models import Profile, Post, LikePost, FollowersCount
+from .models import Profile, Post, LikePost, FollowersCount, Notification
 from django.contrib.auth.decorators import login_required
 from itertools import chain
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
 import random
 
 # Create your views here.
@@ -226,10 +229,26 @@ def search(request):
         username_profile_list = list(chain(*username_profile_list))
     return render(request, 'search.html', {'user_profile': user_profile, 'username_profile_list': username_profile_list})
 
-def delete_post(request, pk):
-   post = get_object_or_404(Post, id=pk)
-   if request.method == 'POST':
-      post.delete()
-      return redirect('/')
 
-   return redirect('/')
+def delete_post(request, pk):
+  post = get_object_or_404(Post, id=pk)
+  profile = Profile.objects.get(user=request.user)
+  print('PROFILE PERM', profile.is_moderator)
+  print('PROFILE ID', profile.id_user)
+  if not profile.is_moderator:
+      return HttpResponseForbidden('No permission to delete')
+  else:
+      if request.method == 'POST':
+          post.delete()
+          return redirect('/')
+  
+  return redirect('/')
+
+@receiver(post_save, sender=FollowersCount)
+def create_follow_notification(sender, instance, created, **kwargs):
+    if created:
+        Notification.objects.create(
+            recipient=instance.user,
+            sender=instance.follower,
+            activity_type='follow_user'
+        )

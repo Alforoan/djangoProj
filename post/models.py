@@ -43,3 +43,10 @@ class FollowersCount(models.Model):
 
   def __str__(self):
     return self.user
+
+class Notification(models.Model):
+  recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='notifications')
+  sender = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
+  activity_type = models.CharField(max_length=100) 
+  timestamp = models.DateTimeField(auto_now_add=True)
+
