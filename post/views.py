@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from itertools import chain
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
+from ratelimit.decorators import ratelimit
 
 import random
 
@@ -134,6 +135,7 @@ def settings(request):
   return render(request, 'settings.html', {'user_profile':user_profile})
 
 @login_required(login_url='signin')
+@ratelimit(key='user', rate='5/m', method=['POST'], block=True)
 def upload(request):
   if request.method == 'POST':
     user = request.user.username
@@ -252,3 +254,4 @@ def create_follow_notification(sender, instance, created, **kwargs):
             sender=instance.follower,
             activity_type='follow_user'
         )
+
